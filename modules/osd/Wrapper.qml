@@ -117,7 +117,7 @@ Item {
         id: content
 
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
+        anchors.right: parent.right
 
         Component.onCompleted: active = Qt.binding(() => root.shouldBeActive || root.visible)
 

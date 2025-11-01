@@ -6,11 +6,9 @@ JsonObject {
 
     property Sizes sizes: Sizes {}
     property Toasts toasts: Toasts {}
-    property Vpn vpn: Vpn {}
 
     component Sizes: JsonObject {
-        property int width: 430
-        property int toastWidth: 430
+        property int width: 320
     }
 
     component Toasts: JsonObject {
@@ -22,13 +20,5 @@ JsonObject {
         property bool audioInputChanged: true
         property bool capsLockChanged: true
         property bool numLockChanged: true
-        property bool kbLayoutChanged: true
-        property bool vpnChanged: true
-        property bool nowPlaying: false
-    }
-
-    component Vpn: JsonObject {
-        property bool enabled: false
-        property list<var> provider: ["netbird"]
     }
 }

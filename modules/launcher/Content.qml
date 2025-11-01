@@ -79,7 +79,7 @@ Item {
             topPadding: Appearance.padding.larger
             bottomPadding: Appearance.padding.larger
 
-            placeholderText: qsTr("Type \"%1\" for commands").arg(Config.launcher.actionPrefix)
+            placeholderText: qsTr("Escribe \"%1\" para ver comandos").arg(Config.launcher.actionPrefix)
 
             onAccepted: {
                 const currentItem = list.currentList?.currentItem;

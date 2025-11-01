@@ -5,7 +5,6 @@ JsonObject {
     property bool showOnHover: true
     property int dragThreshold: 20
     property ScrollActions scrollActions: ScrollActions {}
-    property Popouts popouts: Popouts {}
     property Workspaces workspaces: Workspaces {}
     property Tray tray: Tray {}
     property Status status: Status {}
@@ -57,12 +56,6 @@ JsonObject {
         property bool brightness: true
     }
 
-    component Popouts: JsonObject {
-        property bool activeWindow: true
-        property bool tray: true
-        property bool statusIcons: true
-    }
-
     component Workspaces: JsonObject {
         property int shown: 5
         property bool activeIndicator: true
@@ -75,7 +68,6 @@ JsonObject {
         property string occupiedLabel: "󰮯"
         property string activeLabel: "󰮯"
         property string capitalisation: "preserve" // upper, lower, or preserve - relevant only if label is empty
-        property list<var> specialWorkspaceIcons: []
     }
 
     component Tray: JsonObject {

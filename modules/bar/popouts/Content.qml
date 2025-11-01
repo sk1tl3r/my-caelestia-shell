@@ -45,7 +45,7 @@ Item {
 
         Popout {
             name: "battery"
-            sourceComponent: Battery {}
+            source: "Battery.qml"
         }
 
         Popout {
@@ -57,13 +57,20 @@ Item {
 
         Popout {
             name: "kblayout"
-            sourceComponent: KbLayout {}
+            source: "KbLayout.qml"
         }
 
         Popout {
             name: "lockstatus"
-            sourceComponent: LockStatus {}
+            source: "LockStatus.qml"
         }
+
+        Popout {
+            name: "presentationMode"
+            sourceComponent: PresentationModePopout {}
+        }
+
+        
 
         Repeater {
             model: ScriptModel {
@@ -106,7 +113,7 @@ Item {
         id: popout
 
         required property string name
-        readonly property bool shouldBeActive: root.wrapper.currentName === name
+        property bool shouldBeActive: root.wrapper.currentName === name
 
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right

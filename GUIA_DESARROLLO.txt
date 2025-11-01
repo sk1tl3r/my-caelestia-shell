@@ -1,0 +1,240 @@
+# GUÍA DE DESARROLLO Y MANTENIMIENTO - CAELESTIA PERSONALIZADO
+# Versión 2.3
+
+---
+
+### SECCIÓN 1: PROPÓSITO DE ESTE DOCUMENTO
+
+Este documento sirve como una guía centralizada para el desarrollo y la personalización del entorno de Caelestia. Está diseñado para ser leído tanto por el usuario como por un asistente de IA.
+
+- **Para el Usuario:** Detalla el flujo de trabajo, los scripts y la lógica detrás del entorno de desarrollo para facilitar nuevas personalizaciones.
+- **Para el Asistente de IA:** Proporciona un contexto completo del proyecto y un conjunto de instrucciones a seguir para asistir en futuras modificaciones de forma segura y consistente.
+
+---
+
+### SECCIÓN 2: ESTRUCTURA DEL REPOSITORIO
+
+El repositorio principal (`~/Escritorio/shell`) contiene todo el código fuente y las configuraciones maestras. Su estructura clave es:
+
+```
+~/Escritorio/shell/
+├── components/      # Componentes QML reutilizables (botones, sliders).
+├── config/          # Archivos de configuración base de los módulos.
+├── modules/         # El corazón de Caelestia (barra, dashboard, etc.).
+├── services/        # Servicios backend en QML (colores, audio, etc.).
+├── utils/           # Utilidades generales.
+├── shell.json       # ¡IMPORTANTE! La configuración principal de Caelestia.
+├── configuraciones_adicionales/ # Copia de configs externas (Hyprland, Mako, etc.).
+└── GUIA_DESARROLLO.txt          # Este mismo archivo.
+```
+
+---
+
+### SECCIÓN 3: DEPENDENCIAS Y REQUISITOS
+
+Este entorno de desarrollo depende de varios paquetes clave. La instalación se realizó originalmente con `yay`.
+- **Componentes Principales:** `quickshell-git`, `caelestia-cli`, `hyprland`
+- **Utilidades:** `ddcutil`, `brightnessctl`, `yad`, `jq`, `rsync`, `pacman` (para `checkupdates`)
+- **Fuentes:** `ttf-cascadia-code-nerd` (o similar), `ttf-material-symbols-variable-git`.
+- **Temas (Opcional):** `papirus-icon-theme`, `adw-gtk3`.
+
+---
+
+### SECCIÓN 4: LA SOLUCIÓN IMPLEMENTADA
+
+**4.1. Repositorio Único (`~/Escritorio/shell`)**
+- Se consolidaron todas las modificaciones del código fuente y la configuración principal (`shell.json`) en este único repositorio. Esta carpeta es ahora la **única fuente de verdad**.
+
+**4.2. Script de Control (`caelestia_dev_mode.sh`)**
+- Ubicado en `~/scripts_generales/`, este script automatiza todo el flujo de trabajo.
+- **`start`:** Activa el modo desarrollo. "Esconde" la configuración estable y lanza Caelestia desde el repositorio.
+- **`stop`:** Desactiva el modo desarrollo. Restaura la configuración estable y reinicia Caelestia en modo normal.
+- **`deploy`:** Sincroniza los cambios probados desde el repositorio de desarrollo hacia la configuración estable. **Nota:** Este comando excluye intencionadamente el archivo `modules/bar/components/Clock.qml` para proteger el indicador visual.
+
+**4.3. Indicador Visual de Modo**
+- El icono del **reloj** en la configuración **estable** (`~/.config/quickshell/caelestia/modules/bar/components/Clock.qml`) está modificado para ser de color **rojo**.
+- El icono del reloj en la versión de **desarrollo** tiene su color **normal**.
+- Para asegurar que este indicador no se borre, el comando `deploy` está configurado para ignorar este archivo al sincronizar.
+
+---
+
+### SECCIÓN 5: FLUJO DE TRABAJO COMPLETO
+
+**5.1. Desarrollo y Personalización**
+1.  **Activar Modo Desarrollo:** `~/scripts_generales/caelestia_dev_mode.sh start`
+2.  **Verificar Indicador:** Confirmar que el reloj rojo ha desaparecido.
+3.  **Editar Código y/o Configuración:** Modificar archivos (`.qml`, `shell.json`, etc.) únicamente dentro de `~/Escritorio/shell/`.
+4.  **Previsualizar:** Usar `SUPER + ALT + R` para reiniciar Caelestia y ver los cambios.
+5.  **Guardar en Git (Recomendado):** Usar `git commit` para guardar un cambio funcional.
+
+**5.2. Despliegue (Actualizar el Entorno Estable)**
+Una vez que los cambios en el modo desarrollo son estables y satisfactorios:
+1.  **Salir del Modo Desarrollo:** `~/scripts_generales/caelestia_dev_mode.sh stop`
+2.  **Verificar Modo Estable:** Confirmar que el reloj rojo ha vuelto.
+3.  **Desplegar Cambios:** `~/scripts_generales/caelestia_dev_mode.sh deploy`
+4.  **Reiniciar Shell:** Usar `SUPER + ALT + R` para recargar el shell estable y ver los nuevos cambios aplicados.
+
+---
+
+### SECCIÓN 6: RESPALDO Y RECUPERACIÓN (GIT)
+
+- **Crear un "Respaldo" antes de un gran cambio:** Usa ramas.
+  `git checkout -b mi-nueva-feature`
+
+- **Deshacer Cambios (en modo desarrollo):**
+  - Para descartar todos los cambios no guardados: `git checkout .`
+  - Para descartar cambios en un archivo específico: `git checkout -- <ruta/al/archivo>`
+
+- **Recuperación de Estado Inconsistente:** Si el script `caelestia_dev_mode.sh` falla a mitad de camino:
+  1. Abre una terminal.
+  2. Comprueba si existe la carpeta `~/.config/quickshell/caelestia_OLD`.
+  3. Si existe, para forzar la vuelta a modo estable, ejecuta:
+     `mv ~/.config/quickshell/caelestia_OLD ~/.config/quickshell/caelestia`
+  4. Luego, reinicia Caelestia con `caelestia shell -d`.
+
+---
+
+### SECCIÓN 7: SOLUCIÓN DE PROBLEMAS COMUNES
+
+- **`caelestia_dev_mode.sh` falla:**
+  - Asegúrate de que tiene permisos de ejecución: `chmod +x ~/scripts_generales/caelestia_dev_mode.sh`.
+  - Verifica que las rutas al principio del script son correctas.
+
+- **¿Cómo sé desde dónde se ejecuta Caelestia?**
+  - `lsof -p $(pgrep -f "quickshell -d") | grep .qml`
+  - Si las rutas apuntan a `~/Escritorio/shell`, estás en modo desarrollo.
+
+- **¿Dónde están los logs?**
+  - `quickshell` imprime la ruta al archivo de log al iniciar. Generalmente en `/run/user/1000/quickshell/by-id/.../log.qslog`.
+
+---
+
+### SECCIÓN 8: INSTRUCCIONES PARA EL ASISTENTE DE IA
+
+**¡IMPORTANTE! Sigue estas instrucciones rigurosamente.**
+
+1.  **Contexto Inicial:** Al comienzo de una sesión, lee este archivo en su totalidad.
+2.  **Flujo de Trabajo:** Sigue el flujo descrito en la **SECCIÓN 5**.
+3.  **Documentación de Cambios:** Al finalizar y desplegar una nueva personalización, **DEBES** añadir una nueva sección `### FASE X` al final de este documento, describiendo el cambio y listando los archivos modificados en `~/Escritorio/shell/`.
+4.  **Modificación de esta Guía:** Para añadir la nueva fase, lee el contenido completo, añade la nueva sección al final y usa `write_file` para sobreescribir este mismo archivo.
+
+---
+
+### FASE 0: CONSOLIDACIÓN Y CREACIÓN DEL FLUJO DE DESARROLLO
+
+- **Problema:** El código y las configuraciones estaban dispersos, eran frágiles y difíciles de gestionar.
+- **Análisis:** Se identificaron múltiples ubicaciones con código modificado y se diagnosticó un problema de caché que impedía un entorno de desarrollo limpio. Se descubrió un conflicto entre la sincronización total (`deploy`) y la necesidad de un indicador visual persistente.
+- **Solución:** Se consolidó todo el código y el `shell.json` maestro en `~/Escritorio/shell`. Se creó el script `caelestia_dev_mode.sh` (start/stop/deploy) para gestionar un entorno de desarrollo aislado. Se modificó el comando `deploy` para excluir el archivo del indicador visual (`Clock.qml`), protegiéndolo. Se implementó el indicador (reloj rojo) en la configuración estable. Se documentó todo en esta guía.
+- **Archivos Modificados/Creados:**
+  - `~/Escritorio/shell/` (Poblado con todos los archivos QML modificados)
+  - `~/Escritorio/shell/shell.json` (Creado a partir de la versión en memoria)
+  - `~/scripts_generales/caelestia_dev_mode.sh` (Actualizado con `deploy` y exclusión)
+  - `~/Escritorio/shell/GUIA_DESARROLLO.txt` (Actualizado múltiples veces)
+  - `~/.config/quickshell/caelestia/modules/bar/components/Clock.qml` (Modificado para ser el indicador estable)
+
+### FASE 1: ANÁLISIS DEL MOTOR DE TEMAS
+
+- **Problema:** Se necesitaba confirmar desde cero, sin depender de guías o historiales previos, qué herramienta exacta utiliza Caelestia para extraer la paleta de colores de los fondos de pantalla.
+- **Análisis:** La investigación siguió un proceso de "análisis forense" para encontrar la evidencia:
+  1. Se analizó `shell.json` y se determinó que la acción `>wallpaper` es un comando interno de la aplicación `caelestia`.
+  2. Se usó `which caelestia` para localizar el ejecutable en `/usr/bin/caelestia`.
+  3. Se usó el comando `file` sobre el ejecutable, revelando que es un **script de Python**, lo que permitía leer su código.
+  4. Un `grep` directo por la cadena `materialyoucolor` en el script falló, sugiriendo que el script era un "lanzador" que importaba la lógica principal desde otro lugar.
+  5. La estrategia final y exitosa fue usar el gestor de paquetes: `pacman -Ql caelestia-cli`. Este comando listó todos los archivos del paquete, revelando la ubicación de la librería de Python en `/usr/lib/python3.13/site-packages/caelestia/`.
+  6. Un `grep` recursivo (`grep -r`) sobre este directorio de la librería encontró múltiples importaciones de la librería `materialyoucolor` en archivos clave como `wallpaper.py` y `utils/material/generator.py`.
+- **Solución:** La investigación concluyó con éxito. Se obtuvo prueba irrefutable a nivel de código fuente de que Caelestia utiliza la librería de Python **`materialyoucolor`** como su motor para extraer y aplicar temas de color basados en el fondo de pantalla.
+- **Archivos Modificados:** Ninguno. Esta fase fue puramente de investigación.
+
+### FASE 2: ANÁLISIS DEL ECOSISTEMA DE TEMATIZACIÓN
+
+- **Problema:** Se necesitaba identificar qué aplicaciones, además de Hyprland, son tematizadas por `caelestia-cli` cuando se cambia el fondo de pantalla.
+
+- **Análisis:**
+  1. La investigación inicial, buscando referencias al archivo de esquema de colores (`current.conf`), no reveló todas las aplicaciones afectadas.
+  2. Se utilizó `pacman -Ql caelestia-cli` para listar todos los archivos instalados por el paquete. Este comando fue clave, ya que reveló la existencia de un directorio de plantillas (`/usr/lib/python3.13/site-packages/caelestia/data/templates/`).
+  3. El análisis del código fuente de `caelestia-cli`, específicamente el archivo `utils/theme.py`, confirmó la existencia de una función principal `apply_colours` que orquesta la aplicación de temas.
+  4. Dentro de `theme.py`, se encontraron múltiples funciones `apply_*` (ej: `apply_btop`, `apply_fuzzel`), cada una responsable de leer una plantilla, reemplazar los placeholders de color con los valores de la paleta actual, y escribir el archivo de configuración resultante en la ubicación correcta (`~/.config/...`).
+  5. Se verificó la instalación de cada aplicación candidata con `which` y se compararon los archivos de configuración generados con la paleta de colores actual para confirmar que el proceso funcionaba correctamente.
+  6. Se investigó el caso de Mako, pero no se encontró evidencia en el código de `caelestia-cli` que lo tematice, concluyendo que sus colores son estáticos.
+
+- **Solución:** Se obtuvo una lista completa y verificada de las aplicaciones que `caelestia-cli` tematiza. El sistema funciona mediante plantillas de configuración que son procesadas por el script `theme.py` para generar los archivos de configuración finales con los colores del fondo de pantalla.
+
+- **Lista de Aplicaciones Tematizadas:**
+  - `Fuzzel`
+  - `btop`
+  - `nvtop`
+  - `htop`
+  - `Cava`
+  - `Hyprland`
+  - `Discord`
+  - `Terminales` (en general, a través de secuencias de escape ANSI)
+  - `GTK` (temas para GTK3 y GTK4)
+  - `Qt` (a través de `qtct`)
+  - `Spicetify` (si está instalado)
+  - `Warp Terminal` (si está instalado)
+
+- **Archivos Modificados:** Ninguno. Esta fase fue puramente de investigación y análisis.
+
+### FASE 3: CONFIGURACIÓN DEL ENTORNO DE DESARROLLO PARA CAELESTIA-CLI
+
+- **Problema:** Para poder extender el motor de temas (ej: añadir soporte para nuevas aplicaciones), era necesario poder modificar el código fuente de `caelestia-cli` de forma segura, sin alterar la instalación del sistema y de una manera que persistiera entre actualizaciones.
+
+- **Análisis:**
+  1. Se clarificó la diferencia fundamental entre el proyecto `caelestia` (la interfaz QML, ubicada en `~/Escritorio/shell`) y `caelestia-cli` (el motor de temas en Python).
+  2. Se confirmó que el script `caelestia_dev_mode.sh` solo gestiona el entorno de desarrollo para la parte QML, pero no para el `caelestia-cli`.
+  3. Se determinó que para modificar `caelestia-cli`, era necesario obtener su código fuente y hacer que el sistema lo utilizara en lugar de la versión instalada por `pacman`.
+
+- **Solución:** Se configuró un entorno de desarrollo completo y aislado para `caelestia-cli`:
+  1. Se utilizó `google_web_search` para encontrar el repositorio oficial: `https://github.com/caelestia-dots/cli`.
+  2. Se clonó el repositorio en el directorio local `~/caelestia-cli-dev`.
+  3. Se intentó instalar el paquete con `pip`, pero se encontró un error de `externally-managed-environment`, una protección del sistema operativo.
+  4. La solución fue crear un entorno virtual de Python dentro del repositorio clonado (`python -m venv .venv`), aislando así las dependencias y la instalación.
+  5. Se utilizó el `pip` del entorno virtual para instalar el paquete en "modo editable" con el comando `/home/sk1t/caelestia-cli-dev/.venv/bin/pip install -e .`.
+  6. Con esta configuración, cualquier cambio en los archivos de Python dentro de `~/caelestia-cli-dev/` es utilizado automáticamente por el comando `caelestia`, permitiendo un desarrollo y prueba en tiempo real.
+  7. Se estableció un flujo de trabajo claro para desarrollar en ambas partes (QML y Python) de forma simultánea y segura.
+
+- **Archivos Modificados/Creados:**
+  - `~/caelestia-cli-dev/` (Repositorio de `caelestia-cli` clonado)
+  - `~/caelestia-cli-dev/.venv/` (Entorno virtual de Python)
+
+### FASE 4: EXPANSIÓN DEL MOTOR DE TEMAS - AÑADIENDO SOPORTE PARA KITTY
+
+- **Problema:** Se necesitaba añadir la terminal Kitty al ecosistema de aplicaciones tematizadas por `caelestia-cli`.
+
+- **Análisis:**
+  1. Se localizó el archivo de configuración de Kitty en `~/.config/kitty/kitty.conf`.
+  2. Se creó una plantilla (`kitty.template`) a partir de la configuración existente, reemplazando los colores fijos por placeholders.
+  3. Se añadió una nueva función `apply_kitty` al archivo `theme.py` en el repositorio local de `caelestia-cli`.
+  4. Durante las pruebas iniciales, se encontró un bug crítico: los colores se aplicaban a las terminales Kitty ya abiertas, pero no persistían en las nuevas ventanas.
+  5. El diagnóstico reveló dos problemas:
+      a. El cambio de color inicial se debía a la función `apply_terms` que envía secuencias de escape ANSI a las terminales activas (un cambio temporal), no a la escritura del archivo de configuración.
+      b. La función `apply_kitty` estaba fallando silenciosamente porque el comando `caelestia` ejecutado por la interfaz seguía siendo el del sistema (`/usr/bin/caelestia`), no nuestra versión editable. Se confirmó esto con `which caelestia`.
+
+- **Solución:**
+  1. El problema de raíz se solucionó modificando el script `caelestia_dev_mode.sh`. Se añadió el `PATH` del entorno virtual de `caelestia-cli` al inicio del comando `quickshell`, forzando a que la interfaz de desarrollo utilice nuestra versión editable del motor de temas.
+  2. Se corrigió la plantilla `kitty.template` para usar el formato de placeholder correcto (`{{ $nombre_color }}`).
+  3. Se corrigió la función `apply_kitty` en `theme.py` para que usara el parámetro `hash=True` en la función `gen_replace`, asegurando que los colores se escribieran con el prefijo `#` requerido por Kitty.
+  4. Tras estos arreglos, la implementación final funcionó correctamente, aplicando el tema a Kitty de forma persistente en todas las ventanas nuevas.
+
+- **Archivos Modificados/Creados:**
+  - `~/.config/caelestia/templates/kitty.template` (Creado y luego corregido)
+  - `~/caelestia-cli-dev/src/caelestia/utils/theme.py` (Modificado para añadir la función `apply_kitty`)
+  - `~/scripts_generales/caelestia_dev_mode.sh` (Modificado para actualizar el `PATH` en modo desarrollo)
+
+### FASE 5: DIVERSIFICACIÓN DE COLORES EN LA BARRA DE CAELESTIA
+
+- **Problema:** La barra de Caelestia utilizaba una paleta de colores muy limitada (principalmente `primary` y `secondary`), lo que resultaba en una apariencia visual monótona y con poca jerarquía.
+
+- **Análisis:** Se analizaron los archivos QML del módulo de la barra (`modules/bar/`) para identificar cómo se asignaban los colores a los diferentes componentes. Se confirmó que la mayoría de los iconos heredaban un color raíz (`root.colour`), limitando la variedad. Se decidió asignar colores específicos de la paleta de Material 3 a diferentes componentes para mejorar la jerarquía visual y la estética.
+
+- **Solución:** Se modificaron varios archivos QML para asignar colores de la paleta de forma más deliberada, diferenciando elementos interactivos de los informativos. Los cambios aplicados fueron:
+  - **Ventana Activa (`ActiveWindow.qml`):** Se cambió su color principal a `tertiary`.
+  - **Iconos de Estado (`StatusIcons.qml`):** Se realizaron los siguientes ajustes:
+      - **Iconos de Bloqueo (Mayús/Num):** Se les asignó un color sutil (`onSurfaceVariant`).
+      - **Icono de Audio:** Se le asignó el color `tertiary`.
+      - **Icono de Red:** Se le asignó el color `primary`.
+      - El resto de los iconos (Bluetooth, Batería) mantuvieron el color `secondary` por defecto.
+
+- **Archivos Modificados/Creados:**
+  - `~/Escritorio/shell/modules/bar/components/ActiveWindow.qml` (Modificado)
+  - `~/Escritorio/shell/modules/bar/components/StatusIcons.qml` (Modificado)

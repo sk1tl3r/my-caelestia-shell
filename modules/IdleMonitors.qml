@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import "lock"
 import qs.config
 import qs.services
-import Caelestia.Internal
 import Quickshell
 import Quickshell.Wayland
 
@@ -18,22 +17,13 @@ Scope {
             return;
 
         if (action === "lock")
-            lock.lock.locked = true;
+            root.lock.lock.locked = true;
         else if (action === "unlock")
-            lock.lock.locked = false;
+            root.lock.lock.locked = false;
         else if (typeof action === "string")
             Hypr.dispatch(action);
         else
             Quickshell.execDetached(action);
-    }
-
-    LogindManager {
-        onAboutToSleep: {
-            if (Config.general.idle.lockBeforeSleep)
-                root.lock.lock.locked = true;
-        }
-        onLockRequested: root.lock.lock.locked = true
-        onUnlockRequested: root.lock.lock.unlock()
     }
 
     Variants {

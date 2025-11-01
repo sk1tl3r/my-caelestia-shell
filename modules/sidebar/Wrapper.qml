@@ -7,6 +7,12 @@ import QtQuick
 Item {
     id: root
 
+ // BLOQUE DE DEPURACIÓN AÑADIDO
+Component.onCompleted: {
+ console.log("--- DEBUG BARRA LATERAL ---");
+console.log("Valor de Config.sidebar.sizes.width:", Config.sidebar.sizes.width);
+}
+
     required property var visibilities
     required property var panels
     readonly property Props props: Props {}
@@ -19,7 +25,8 @@ Item {
         when: root.visibilities.sidebar && Config.sidebar.enabled
 
         PropertyChanges {
-            root.implicitWidth: Config.sidebar.sizes.width
+            target: root
+	implicitWidth: Config.sidebar.sizes.width
         }
     }
 

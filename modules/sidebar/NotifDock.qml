@@ -64,7 +64,7 @@ Item {
             anchors.right: parent.right
             anchors.leftMargin: Appearance.spacing.small
 
-            text: root.notifCount > 0 ? qsTr("notification%1").arg(root.notifCount === 1 ? "" : "s") : qsTr("Notifications")
+            text: root.notifCount > 0 ? qsTr("notificación%1").arg(root.notifCount === 1 ? "" : "es") : qsTr("Notificaciones")
             color: Colours.palette.m3outline
             font.pointSize: Appearance.font.size.normal
             font.family: Appearance.font.family.mono
@@ -109,8 +109,8 @@ Item {
 
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("No Notifications")
-                    color: Colours.palette.m3outlineVariant
+                    text: qsTr("No hay notificaciones")
+                    color: Colours.tPalette.m3outlineVariant
                     font.pointSize: Appearance.font.size.large
                     font.family: Appearance.font.family.mono
                     font.weight: 500

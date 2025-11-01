@@ -5,6 +5,7 @@ import qs.config
 import "popouts" as BarPopouts
 import "components"
 import "components/workspaces"
+import qs.services
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
@@ -45,7 +46,7 @@ ColumnLayout {
         const item = ch.item;
         const itemHeight = item.implicitHeight;
 
-        if (id === "statusIcons" && Config.bar.popouts.statusIcons) {
+        if (id === "statusIcons") {
             const items = item.items;
             const icon = items.childAt(items.width / 2, mapToItem(items, 0, y).y);
             if (icon) {
@@ -53,7 +54,7 @@ ColumnLayout {
                 popouts.currentCenter = Qt.binding(() => icon.mapToItem(root, 0, icon.implicitHeight / 2).y);
                 popouts.hasCurrent = true;
             }
-        } else if (id === "tray" && Config.bar.popouts.tray) {
+        } else if (id === "tray") {
             if (!Config.bar.tray.compact || (item.expanded && !item.expandIcon.contains(mapToItem(item.expandIcon, item.implicitWidth / 2, y)))) {
                 const index = Math.floor(((y - top - item.padding * 2 + item.spacing) / item.layout.implicitHeight) * item.items.count);
                 const trayItem = item.items.itemAt(index);
@@ -68,11 +69,15 @@ ColumnLayout {
                 popouts.hasCurrent = false;
                 item.expanded = true;
             }
-        } else if (id === "activeWindow" && Config.bar.popouts.activeWindow) {
+        } else if (id === "presentationMode") {
+            popouts.currentName = "presentationMode";
+            popouts.currentCenter = Qt.binding(() => ch.mapToItem(root, 0, ch.implicitHeight / 2).y);
+            popouts.hasCurrent = true;
+        } /*else if (id === "activeWindow") {
             popouts.currentName = id.toLowerCase();
             popouts.currentCenter = item.mapToItem(root, 0, itemHeight / 2).y;
             popouts.hasCurrent = true;
-        }
+        }*/
     }
 
     function handleWheel(y: real, angleDelta: point): void {
@@ -123,12 +128,29 @@ ColumnLayout {
                     sourceComponent: OsIcon {}
                 }
             }
+
             DelegateChoice {
                 roleValue: "workspaces"
                 delegate: WrappedLoader {
                     sourceComponent: Workspaces {
                         screen: root.screen
                     }
+                }
+            }
+
+
+
+            DelegateChoice {
+                roleValue: "update"
+                delegate: WrappedLoader {
+                    sourceComponent: Update {}
+                }
+            }
+
+            DelegateChoice {
+                roleValue: "presentationMode"
+                delegate: WrappedLoader {
+                    sourceComponent: PresentationMode {}
                 }
             }
             DelegateChoice {

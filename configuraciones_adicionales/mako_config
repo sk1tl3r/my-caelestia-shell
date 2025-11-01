@@ -1,0 +1,46 @@
+# ~/.config/mako/config
+
+# --- COLORES NEUTRALES Y BLUR ---
+background-color=#1e2030
+text-color=#cad3f5
+border-color=#48454e
+progress-color=over #89b4fa
+
+
+# --- TU CONFIGURACIÓN DE DISEÑO (YA ESTÁ PERFECTA) ---
+border-size=2
+border-radius=12
+padding=5
+margin=20
+width=300
+height=50
+
+font=JetBrainsMono Nerd Font 9
+
+default-timeout=3000
+ignore-timeout=false
+anchor=top-right
+layer=overlay
+
+icons=true
+max-icon-size=32
+
+# Opcionales si querés más orden
+max-history=50
+
+# --- REGLA PARA CAPTURAS DE PANTALLA (MÉTODO OFICIAL DE MAKO) ---
+[app-name=screenshot-tool]
+on-button-left=exec thunar "$HOME/Imágenes/Screenshots"
+
+# --- REGLAS POR URGENCIA ---
+
+# Notificaciones de baja urgencia (ej: cambio de canción)
+[urgency=low]
+border-color=#89b4fa
+
+# Notificaciones críticas (ej: batería muy baja)
+[urgency=critical]
+background-color=#e64553
+text-color=#1e2030
+border-color=#e64553
+ignore-timeout=true

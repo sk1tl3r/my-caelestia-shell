@@ -84,14 +84,6 @@ StyledRect {
                 checked: Notifs.dnd
                 onClicked: Notifs.dnd = !Notifs.dnd
             }
-
-            Toggle {
-                icon: "vpn_key"
-                checked: VPN.connected
-                enabled: !VPN.connecting
-                visible: VPN.enabled
-                onClicked: VPN.toggle()
-            }
         }
     }
 

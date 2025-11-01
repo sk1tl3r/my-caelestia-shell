@@ -4,13 +4,12 @@ import qs.components
 import qs.services
 import qs.config
 import QtQuick
-
 Column {
     id: root
 
-    property color colour: Colours.palette.m3tertiary
+    property color colour: Colours.palette.m3secondary
 
-    spacing: Appearance.spacing.small
+    spacing: 4
 
     Loader {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -20,7 +19,7 @@ Column {
         asynchronous: true
 
         sourceComponent: MaterialIcon {
-            text: "calendar_month"
+            text: "schedule"
             color: root.colour
         }
     }

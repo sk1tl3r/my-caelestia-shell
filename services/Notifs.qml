@@ -108,8 +108,8 @@ Singleton {
         name: "clearNotifs"
         description: "Clear all notifications"
         onPressed: {
-            for (const notif of root.list.slice())
-                notif.close();
+            for (const notif of root.list)
+                notif.popup = false;
         }
     }
 
@@ -117,8 +117,8 @@ Singleton {
         target: "notifs"
 
         function clear(): void {
-            for (const notif of root.list.slice())
-                notif.close();
+            for (const notif of root.list)
+                notif.popup = false;
         }
 
         function isDndEnabled(): bool {

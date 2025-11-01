@@ -95,7 +95,7 @@ StyledRect {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Config.bar.tray.background ? Appearance.padding.small : -Appearance.padding.small
                 text: "expand_less"
-                font.pointSize: Appearance.font.size.large
+                font.pointSize: Appearance.font.size.normal
                 rotation: root.expanded ? 180 : 0
 
                 Behavior on rotation {

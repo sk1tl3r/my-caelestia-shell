@@ -11,7 +11,7 @@ Item {
 
     required property var bar
     required property Brightness.Monitor monitor
-    property color colour: Colours.palette.m3primary
+    property color colour: Colours.palette.m3tertiary
 
     readonly property int maxHeight: {
         const otherModules = bar.children.filter(c => c.id && c.item !== this && c.id !== "spacer");

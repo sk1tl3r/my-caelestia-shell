@@ -46,7 +46,6 @@ Item {
 
                 icon: Icons.getVolumeIcon(value, root.muted)
                 value: root.volume
-                to: Config.services.maxVolume
                 onMoved: Audio.setVolume(value)
             }
         }
@@ -71,7 +70,6 @@ Item {
 
                     icon: Icons.getMicVolumeIcon(value, root.sourceMuted)
                     value: root.sourceVolume
-                    to: Config.services.maxVolume
                     onMoved: Audio.setSourceVolume(value)
                 }
             }
@@ -109,13 +107,13 @@ Item {
     component WrappedLoader: Loader {
         required property bool shouldBeActive
 
-        Layout.preferredHeight: shouldBeActive ? Config.osd.sizes.sliderHeight : 0
+        Layout.preferredWidth: shouldBeActive ? Config.osd.sizes.sliderWidth : 0
         opacity: shouldBeActive ? 1 : 0
         active: opacity > 0
         asynchronous: true
         visible: active
 
-        Behavior on Layout.preferredHeight {
+        Behavior on Layout.preferredWidth {
             Anim {
                 easing.bezierCurve: Appearance.anim.curves.emphasized
             }

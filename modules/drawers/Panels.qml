@@ -39,9 +39,8 @@ Item {
         screen: root.screen
         visibilities: root.visibilities
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: session.width + sidebar.width
+        anchors.right: sidebar.left
+        anchors.topMargin: 0
     }
 
     Notifications.Wrapper {

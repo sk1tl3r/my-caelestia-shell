@@ -53,26 +53,50 @@ RowLayout {
         sublabel2: qsTr("Usage")
     }
 
+    // Memoria (RAM) — separado
     Resource {
         Layout.alignment: Qt.AlignVCenter
         Layout.topMargin: root.padding
         Layout.bottomMargin: root.padding
-        Layout.rightMargin: root.padding * 3
 
-        value1: SystemUsage.memPerc
-        value2: SystemUsage.storagePerc
+        value1: Math.max(0, Math.min(1, SystemUsage.memPerc))
+        value2: Math.max(0, Math.min(1, SystemUsage.memPerc))
 
         label1: {
             const fmt = SystemUsage.formatKib(SystemUsage.memUsed);
             return `${+fmt.value.toFixed(1)}${fmt.unit}`;
         }
         label2: {
-            const fmt = SystemUsage.formatKib(SystemUsage.storageUsed);
+            const fmt = SystemUsage.formatKib(SystemUsage.memTotal);
             return `${Math.floor(fmt.value)}${fmt.unit}`;
         }
 
         sublabel1: qsTr("Memory")
-        sublabel2: qsTr("Storage")
+        sublabel2: qsTr("Total")
+    }
+
+    // Almacenamiento — separado (usando la lógica original de SystemUsage)
+    Resource {
+        Layout.alignment: Qt.AlignVCenter
+        Layout.topMargin: root.padding
+        Layout.bottomMargin: root.padding
+        Layout.rightMargin: root.padding * 3
+
+        value1: Math.max(0, Math.min(1, SystemUsage.storagePerc))
+        value2: Math.max(0, Math.min(1, 1 - SystemUsage.storagePerc))
+
+        label1: {
+            const fmt = SystemUsage.formatKib(SystemUsage.storageUsed);
+            return `${Math.floor(fmt.value)}${fmt.unit}`;
+        }
+        label2: {
+            const avail = Math.max(0, SystemUsage.storageTotal - SystemUsage.storageUsed);
+            const fmt = SystemUsage.formatKib(avail);
+            return `${Math.floor(fmt.value)}${fmt.unit}`;
+        }
+
+        sublabel1: qsTr("Storage")
+        sublabel2: qsTr("Free")
     }
 
     component Resource: Item {

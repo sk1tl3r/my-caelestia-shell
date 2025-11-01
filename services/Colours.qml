@@ -171,7 +171,7 @@ Singleton {
         property color m3surfaceBright: "#403739"
         property color m3surfaceContainerLowest: "#130c0e"
         property color m3surfaceContainerLow: "#22191c"
-        property color m3surfaceContainer: "#261d20"
+        property color m3surfaceContainer: "#1e2030"
         property color m3surfaceContainerHigh: "#31282a"
         property color m3surfaceContainerHighest: "#3c3235"
         property color m3onSurface: "#efdfe2"

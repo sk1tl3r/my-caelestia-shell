@@ -26,12 +26,12 @@ StyledRect {
     ColumnLayout {
         id: iconColumn
 
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Appearance.padding.normal
 
         spacing: Appearance.spacing.smaller / 2
+
 
         // Lock keys status
         WrappedLoader {
@@ -54,7 +54,7 @@ StyledRect {
                         opacity: Hypr.capsLock ? 1 : 0
 
                         text: "keyboard_capslock_badge"
-                        color: root.colour
+                        color: Colours.palette.m3onSurfaceVariant
 
                         Behavior on opacity {
                             Anim {}
@@ -85,7 +85,7 @@ StyledRect {
                         opacity: Hypr.numLock ? 1 : 0
 
                         text: "looks_one"
-                        color: root.colour
+                        color: Colours.palette.m3onSurfaceVariant
 
                         Behavior on opacity {
                             Anim {}
@@ -108,10 +108,35 @@ StyledRect {
             name: "audio"
             active: Config.bar.status.showAudio
 
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: Icons.getVolumeIcon(Audio.volume, Audio.muted)
-                color: root.colour
+            sourceComponent: Item {
+                implicitWidth: 24
+                implicitHeight: 24
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    animate: true
+                    text: Icons.getVolumeIcon(Audio.volume, Audio.muted)
+                    color: Colours.palette.m3tertiary
+                }
+
+                // StateLayer para clics - permite el hover para el popout
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    propagateComposedEvents: true
+                    
+                    onClicked: (mouse) => {
+                        if (mouse.button === Qt.LeftButton) {
+                            if (Audio.sink?.audio) Audio.sink.audio.muted = !Audio.muted;
+                            mouse.accepted = true;
+                        } else if (mouse.button === Qt.RightButton) {
+                            Quickshell.execDetached(["pavucontrol"]);
+                            mouse.accepted = true;
+                        } else {
+                            mouse.accepted = false;
+                        }
+                    }
+                }
             }
         }
 
@@ -148,7 +173,7 @@ StyledRect {
             sourceComponent: MaterialIcon {
                 animate: true
                 text: Network.active ? Icons.getNetworkIcon(Network.active.strength ?? 0) : "wifi_off"
-                color: root.colour
+                color: Colours.palette.m3primary
             }
         }
 
@@ -223,28 +248,42 @@ StyledRect {
             name: "battery"
             active: Config.bar.status.showBattery
 
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: {
-                    if (!UPower.displayDevice.isLaptopBattery) {
-                        if (PowerProfiles.profile === PowerProfile.PowerSaver)
-                            return "energy_savings_leaf";
-                        if (PowerProfiles.profile === PowerProfile.Performance)
-                            return "rocket_launch";
-                        return "balance";
-                    }
+            sourceComponent: ColumnLayout {
+                width: batIcon.implicitWidth
+                spacing: -2 // Negative spacing to pull the text up
 
-                    const perc = UPower.displayDevice.percentage;
-                    const charging = [UPowerDeviceState.Charging, UPowerDeviceState.FullyCharged, UPowerDeviceState.PendingCharge].includes(UPower.displayDevice.state);
-                    if (perc === 1)
-                        return charging ? "battery_charging_full" : "battery_full";
-                    let level = Math.floor(perc * 7);
-                    if (charging && (level === 4 || level === 1))
-                        level--;
-                    return charging ? `battery_charging_${(level + 3) * 10}` : `battery_${level}_bar`;
+                MaterialIcon {
+                    id: batIcon // Add ID to be referenced
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    animate: true
+                    text: {
+                        if (!UPower.displayDevice.isLaptopBattery) {
+                            if (PowerProfiles.profile === PowerProfile.PowerSaver)
+                                return "energy_savings_leaf";
+                            if (PowerProfiles.profile === PowerProfile.Performance)
+                                return "rocket_launch";
+                            return "balance";
+                        }
+
+                        const perc = UPower.displayDevice.percentage;
+                        const charging = !UPower.onBattery;
+                        if (perc === 1)
+                            return charging ? "battery_charging_full" : "battery_full";
+                        let level = Math.floor(perc * 7);
+                        if (charging && (level === 4 || level === 1))
+                            level--;
+                        return charging ? `battery_charging_${(level + 3) * 10}` : `battery_${level}_bar`;
+                    }
+                    color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
+                    fill: 1
                 }
-                color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
-                fill: 1
+
+                StyledText {
+                    text: Math.floor(UPower.displayDevice.percentage * 100)
+                    font.pointSize: 8
+                    color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
             }
         }
     }

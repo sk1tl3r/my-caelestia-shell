@@ -25,8 +25,8 @@ Shape {
     Osd.Background {
         wrapper: root.panels.osd
 
-        startX: root.width - root.panels.session.width - root.panels.sidebar.width
-        startY: (root.height - wrapper.height) / 2 - rounding
+        startX: root.width - root.panels.session.width - root.panels.sidebar.width - Appearance.spacing.large - Appearance.padding.large * 2
+        startY: Appearance.spacing.large - rounding - Appearance.padding.normal
     }
 
     Notifications.Background {
